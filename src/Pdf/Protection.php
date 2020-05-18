@@ -140,7 +140,7 @@ class Protection
 			$len = 10;
 		}
 
-		return substr($this->md5toBinary($this->encryptionKey . pack('VXxx', $n)), 0, $len);
+		return substr($this->hashtoBinary($this->encryptionKey . pack('VXxx', $n)), 0, $len);
 	}
 
 	/**
@@ -252,10 +252,10 @@ class Protection
 
 	private function oValue($user_pass, $owner_pass)
 	{
-		$tmp = $this->md5toBinary($owner_pass);
+		$tmp = $this->hashtoBinary($owner_pass);
 		if ($this->useRC128Encryption) {
 			for ($i = 0; $i < 50; ++$i) {
-				$tmp = $this->md5toBinary($tmp);
+				$tmp = $this->hashtoBinary($tmp);
 			}
 		}
 		if ($this->useRC128Encryption) {
@@ -282,7 +282,7 @@ class Protection
 	private function uValue()
 	{
 		if ($this->useRC128Encryption) {
-			$tmp = $this->md5toBinary($this->padding . $this->hexToString($this->uniqid));
+			$tmp = $this->hashtoBinary($this->padding . $this->hexToString($this->uniqid));
 			$enc = $this->rc4($this->encryptionKey, $tmp);
 			$len = strlen($tmp);
 			for ($i = 1; $i <= 19; ++$i) {
@@ -324,11 +324,11 @@ class Protection
 		$perms .= chr(bindec(substr($prot, 8, 8)));
 		$perms .= chr(bindec(substr($prot, 0, 8)));
 
-		$tmp = $this->md5toBinary($user_pass . $this->oValue . $perms . $this->hexToString($this->uniqid));
+		$tmp = $this->hashtoBinary($user_pass . $this->oValue . $perms . $this->hexToString($this->uniqid));
 
 		if ($this->useRC128Encryption) {
 			for ($i = 0; $i < 50; ++$i) {
-				$tmp = $this->md5toBinary(substr($tmp, 0, $keybytelen));
+				$tmp = $this->hashtoBinary(substr($tmp, 0, $keybytelen));
 			}
 		}
 
@@ -338,9 +338,9 @@ class Protection
 		$this->pValue = $protection;
 	}
 
-	private function md5toBinary($string)
+	private function hashtoBinary($string)
 	{
-		return pack('H*', md5($string));
+		return pack('H*', password_hash($string, PASSWORD_DEFAULT));
 	}
 
 	private function hexToString($hs)

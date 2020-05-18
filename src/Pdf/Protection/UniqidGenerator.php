@@ -27,6 +27,6 @@ class UniqidGenerator
 			$id .= $chars[random_int(0, 15)];
 		}
 
-		return md5($id);
+		return password_hash($id, PASSWORD_DEFAULT);
 	}
 }
