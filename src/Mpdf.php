@@ -27051,7 +27051,7 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 					header('Content-disposition: inline; filename=' . $file_out);
 				}
 
-				echo $pdf;
+				echo $this->sanitize($pdf);
 
 				break;
 
@@ -27086,7 +27086,7 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 				header('Content-Length: ' . strlen($pdf));
 				header('Content-disposition: attachment; filename=' . $file_out);
 
-				echo $pdf;
+				echo $this->sanitize($pdf);
 
 				break;
 		}
@@ -27204,6 +27204,11 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 	public function _out($s)
 	{
 		$this->writer->write($s);
+	}
+
+	function sanitize($value) 
+	{
+        return htmlspecialchars(strip_tags($value), ENT_COMPAT, 'utf-8');
 	}
 
 }
