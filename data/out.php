@@ -47,10 +47,10 @@ if ($tempfilename && file_exists($path . $tempfilename)) {
 		header('Content-Length: ' . $filesize);
 	}
 
-	$fd = fopen(basename(realpath($path . $tempfilename)), 'rb');
+	$fd = fopen(realpath($path . $tempfilename), 'rb');
 	fpassthru($fd);
 	fclose($fd);
-	unlink(basename(realpath($path . $tempfilename)));
+	unlink(realpath($path . $tempfilename));
 
 	// ====================== DELETE OLD FILES - Housekeeping =========================================
 	// Clear any files in directory that are >24 hrs old

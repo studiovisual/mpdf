@@ -818,7 +818,7 @@ class MetadataWriter implements \Psr\Log\LoggerAwareInterface
 			$branch = isset($path[2]) ? trim($path[2]) : '';
 			$revFile = __DIR__ . '/../../.git/refs/heads/' . $branch;
 			if ($branch && file_exists($revFile)) {
-				$rev = file(basename(realpath($revFile)));
+				$rev = file(realpath($revFile));
 				$rev = substr($rev[0], 0, 7);
 				$return .= ' (' . $rev . ')';
 			}
