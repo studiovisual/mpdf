@@ -173,13 +173,13 @@ class ImageProcessor implements \Psr\Log\LoggerAwareInterface
 				return $this->imageError($file, $firsttime, 'Unknown image variable');
 			}
 			$data = $this->mpdf->imageVars[$v[1]];
-			$file = password_hash($data, PASSWORD_DEFAULT);
+			$file = hash("sha256", $data);
 		}
 
 		if (preg_match('/data:image\/(gif|jpe?g|png);base64,(.*)/', $file, $v)) {
 			$type = $v[1];
 			$data = base64_decode($v[2]);
-			$file = password_hash($data, PASSWORD_DEFAULT);
+			$file = hash("sha256", $data);
 		}
 
 		// mPDF 5.7.4 URLs
@@ -323,7 +323,7 @@ class ImageProcessor implements \Psr\Log\LoggerAwareInterface
 				$im = @imagecreatefromstring($data);
 
 				if ($im) {
-					$tempfile = $this->cache->tempFilename('_tempImgPNG' . password_hash($file, PASSWORD_DEFAULT) . random_int(1, 10000) . '.png');
+					$tempfile = $this->cache->tempFilename('_tempImgPNG' . hash("sha256", $file) . random_int(1, 10000) . '.png');
 					imageinterlace($im, false);
 					$check = @imagepng($im, $tempfile);
 					if (!$check) {
@@ -568,7 +568,7 @@ class ImageProcessor implements \Psr\Log\LoggerAwareInterface
 				$w = imagesx($im);
 				$h = imagesy($im);
 
-				$tempfile =  $this->cache->tempFilename('_tempImgPNG' . password_hash($file, PASSWORD_DEFAULT) . random_int(1, 10000) . '.png');
+				$tempfile =  $this->cache->tempFilename('_tempImgPNG' . hash("sha256", $file) . random_int(1, 10000) . '.png');
 
 				// Alpha channel set (including using tRNS for Paletted images)
 				if ($pngalpha) {
@@ -659,9 +659,10 @@ class ImageProcessor implements \Psr\Log\LoggerAwareInterface
 						imagegammacorrect($im, $gamma, 2.2);
 					}
 
-					$tempfile_alpha =  $this->cache->tempFilename('_tempMskPNG' . password_hash($file, PASSWORD_DEFAULT) . random_int(1, 10000) . '.png');
+					$tempfile_alpha =  $this->cache->tempFilename('_tempMskPNG' . hash("sha256", $file) . random_int(1, 10000) . '.png');
 
 					$check = @imagepng($imgalpha, $tempfile_alpha);
+
 
 					if (!$check) {
 						return $this->imageError($file, $firsttime, 'Failed to create temporary image file (' . $tempfile_alpha . ') parsing PNG image with alpha channel (' . $errpng . ')');
@@ -887,7 +888,7 @@ class ImageProcessor implements \Psr\Log\LoggerAwareInterface
 
 				$im = @imagecreatefromstring($data);
 				if ($im) {
-					$tempfile = $this->cache->tempFilename('_tempImgPNG' . password_hash($file, PASSWORD_DEFAULT) . random_int(1, 10000) . '.png');
+					$tempfile = $this->cache->tempFilename('_tempImgPNG' . hash("sha256", $file) . random_int(1, 10000) . '.png');
 					imagealphablending($im, false);
 					imagesavealpha($im, false);
 					imageinterlace($im, false);
@@ -1045,7 +1046,7 @@ class ImageProcessor implements \Psr\Log\LoggerAwareInterface
 					return $this->imageError($file, $firsttime, 'Error parsing image file - image type not recognised, and not supported by GD imagecreate');
 				}
 
-				$tempfile = $this->cache->tempFilename('_tempImgPNG' . password_hash($file, PASSWORD_DEFAULT) . random_int(1, 10000) . '.png');
+				$tempfile = $this->cache->tempFilename('_tempImgPNG' . hash("sha256", $file) . random_int(1, 10000) . '.png');
 
 				imagealphablending($im, false);
 				imagesavealpha($im, false);
@@ -1296,7 +1297,7 @@ class ImageProcessor implements \Psr\Log\LoggerAwareInterface
 				if ($dpi) {
 					$minfo['set-dpi'] = $dpi;
 				}
-				$tempfile = '_tempImgPNG' . password_hash($data, PASSWORD_DEFAULT) . random_int(1, 10000) . '.png';
+				$tempfile = '_tempImgPNG' . hash("sha256", $data) . random_int(1, 10000) . '.png';
 				$imgmask = count($this->mpdf->images) + 1;
 				$minfo['i'] = $imgmask;
 				$this->mpdf->images[$tempfile] = $minfo;
